@@ -197,9 +197,10 @@ identical node states and pathway classifications in guided and expert views.
   design, the four misalignment patterns, the unsolved-task figure and the absence of trajectory
   monitoring. Those are OpenAI's retrospective analysis of its own incident: evidence, not ground
   truth, and weighed against the third-party investigation. Where OpenAI and METR/Redwood read the
-  same behaviour differently, both readings are shown. Three claims attributed to OpenAI in a review
-  brief could not be located in any source available here and are **listed in the interface as claims
-  the model does not rest on** rather than encoded.
+  same behaviour differently, both readings are shown. Three quantitative claims from OpenAI's report are
+  **listed in the interface as claims the model does not rest on** rather than encoded. They are
+  retrievable in that report; the reason for excluding them is that each rests on a single interested
+  party's retrospective or counterfactual internal analysis without independent corroboration.
 - **One contested node.** Hugging Face describe simultaneous multi-layer detection; earlier reporting
   described correlated-but-unescalated signals; OpenAI took roughly a week to identify its own agent.
   The model does not pick a winner.
@@ -225,8 +226,9 @@ runs the assertions, the contrast audit and the headless route sweep. It exits n
 fails. Individual checks can also be run on their own: `./run_tests.sh`, `python3 contrast_check.py`,
 `./headless_checks.sh`.
 
-**148 assertions**, covering the rule engine and three-valued logic (including a 7,200-combination
-sweep of the structural invariant that no step can occur while a required predecessor does not), the
+**155 assertions**, covering the rule engine and three-valued logic (including seven direct
+sentinels on the truth tables above and a 7,200-combination sweep of the structural invariant that no
+step can occur while a required predecessor does not), the
 ten structural invariants listed in `VALIDATION.md`, model equivalence across views, mechanism-specific
 routing, heading structure, focus management, and language discipline.
 
@@ -243,5 +245,6 @@ routing, heading structure, focus management, and language discipline.
 | `contrast_check.py` | WCAG contrast audit over the CSS tokens, all three theme states |
 | `validate.sh` | One offline command: rebuild check, assertions, contrast, routes |
 | `make_figures.sh` | Regenerates the appendix figures offscreen from `explorer.html`; prints the source checksum |
+| `figures/` | The four appendix figures and their draft captions |
 | `SOURCES.md` | Source provenance, and what the sources do not settle |
 | `VALIDATION.md` | Technical and structural validation: commands, results and the ten invariants |

@@ -121,3 +121,20 @@ headless_checks.sh      route and viewport sweep
 contrast_check.py       contrast audit across themes
 validate.sh             one offline command running all of the above
 ```
+
+## 7. Addendum, 14 September 2026
+
+The findings above record the audit as performed, and their figures are left unchanged. Three facts
+have since moved:
+
+- **The suite is now 155 assertions, not 148.** Seven sentinels (`K0`-`K6`) were added to pin the
+  published three-valued semantics. They drive the production evaluator rather than reimplementing it,
+  and switching the conjunction to standard strong Kleene fails `K1` and `K2` with a non-zero exit.
+- **The files are now under version control and public.** Row 5 of section 2 reported them as
+  untracked with no history to scan; that was true at the time of the audit. The repository now has
+  history, so a future audit should scan it.
+- **The release surface has grown** beyond the 14 files and 380 KB recorded in section 2, by
+  `make_figures.sh` and the `figures/` directory.
+
+`model.js` gained an explanatory comment at `test()` describing the conjunction semantics. It changes
+no output: `explorer.html` rebuilds byte-identically and every figure regenerates unchanged.

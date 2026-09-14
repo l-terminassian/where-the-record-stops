@@ -679,4 +679,58 @@ var nc=[];
 if(nc.length) LOG("       "+nc.slice(0,4).join(" | "));
 chk("NC negative control: settings outside a pathway never move its outcome", nc.length===0);
 
+LOG("");
+LOG("--- published three-valued semantics (Table B.1) ---");
+
+/* K1-K6: pin the truth-table cells the report publishes.
+   These drive the REAL evaluator: synthetic nodes are appended to NODES, evaluated by
+   evaluate() -> test(), then removed. No second implementation of the logic exists here,
+   so a change to test() moves these assertions. Three operand nodes give a known
+   true / false / unresolved input; six rule nodes combine them. */
+(function(){
+  var added = [
+    {id:"_k_t",lane:"bridge",label:"synthetic TRUE",status:"projected",
+     rule:{all:[{p:"objective",notIn:["__never__"]}]}},
+    {id:"_k_f",lane:"bridge",label:"synthetic FALSE",status:"projected",
+     rule:{all:[{p:"objective",in:["__never__"]}]}},
+    {id:"_k_u",lane:"bridge",label:"synthetic UNRESOLVED",status:"projected",
+     rule:{all:[{p:"objective",in:["__never__"]}]},
+     unresolvedIf:{all:[{p:"objective",notIn:["__never__"]}]}},
+    {id:"_k_and_uf",lane:"bridge",label:"U AND F",status:"projected",
+     rule:{all:[{n:"_k_u",is:"active"},{n:"_k_f",is:"active"}]}},
+    {id:"_k_and_fu",lane:"bridge",label:"F AND U",status:"projected",
+     rule:{all:[{n:"_k_f",is:"active"},{n:"_k_u",is:"active"}]}},
+    {id:"_k_and_tf",lane:"bridge",label:"T AND F",status:"projected",
+     rule:{all:[{n:"_k_t",is:"active"},{n:"_k_f",is:"active"}]}},
+    {id:"_k_or_tu",lane:"bridge",label:"T OR U",status:"projected",
+     rule:{any:[{n:"_k_t",is:"active"},{n:"_k_u",is:"active"}]}},
+    {id:"_k_or_uf",lane:"bridge",label:"U OR F",status:"projected",
+     rule:{any:[{n:"_k_u",is:"active"},{n:"_k_f",is:"active"}]}},
+    {id:"_k_or_ff",lane:"bridge",label:"F OR F",status:"projected",
+     rule:{any:[{n:"_k_f",is:"active"},{n:"_k_f",is:"active"}]}}
+  ];
+  var mark = NODES.length;
+  added.forEach(function(n){ NODES.push(n); });
+  var k = evaluate(base());
+
+  /* operand sanity: if these are wrong the six cells below prove nothing */
+  var operandsOk = k._k_t==="active" && k._k_f==="inactive" && k._k_u==="unresolved";
+  chk("K0 synthetic operands evaluate to true / false / unresolved", operandsOk);
+
+  chk("K1 AND: unresolved AND false = unresolved (departs from strong Kleene)",
+      k._k_and_uf==="unresolved");
+  chk("K2 AND: false AND unresolved = unresolved (order-independent)",
+      k._k_and_fu==="unresolved");
+  chk("K3 AND: true AND false = false",
+      k._k_and_tf==="inactive");
+  chk("K4 OR: true OR unresolved = true (strong Kleene)",
+      k._k_or_tu==="active");
+  chk("K5 OR: unresolved OR false = unresolved",
+      k._k_or_uf==="unresolved");
+  chk("K6 OR: false OR false = false",
+      k._k_or_ff==="inactive");
+
+  NODES.splice(mark, added.length);   /* leave the model exactly as found */
+})();
+
 LOG(""); LOG("TOTAL passed "+passes+"   failed "+fails);
