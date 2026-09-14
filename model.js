@@ -402,6 +402,13 @@ const COMPARE=["gov_paper","gov_effective"];
 function evaluate(P){
   const S={}; NODES.forEach(n=>S[n.id]=n.locked?"active":"inactive");
   function test(c,S){
+    /* Conjunction is deliberately NOT strong Kleene. Strong Kleene gives F AND U = F;
+       this returns U whenever any conjunct is unresolved, even alongside a false one.
+       Intentional, not a bug: the model declines to report "does not occur" while a
+       required input is unestablished in the reviewed sources. Disjunction IS strong
+       Kleene - one true disjunct settles the result and no unknown can unsettle it.
+       Truth tables and reasoning: README.md, "Three-valued semantics".
+       Changing either line changes published results; see VALIDATION.md. */
     if(c.all){const r=c.all.map(x=>test(x,S)); return r.every(v=>v==="t")?"t":(r.includes("u")?"u":"f");}
     if(c.any){const r=c.any.map(x=>test(x,S)); return r.includes("t")?"t":(r.includes("u")?"u":"f");}
     if(c.p!==undefined){

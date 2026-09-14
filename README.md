@@ -65,6 +65,35 @@ nothing is typed `enables` where the evidence supports only "may have increased 
 states (`{n, is|not}`). Three-valued: true / unknown / false, evaluated to a fixpoint. Every rule is
 rendered in the inspector.
 
+### Three-valued semantics
+
+Disjunction follows strong Kleene semantics: any true input settles the result as true, and no
+unknown can unsettle it. Conjunction is **deliberately more conservative than strong Kleene**: any
+unresolved conjunct yields unresolved, even when another conjunct is already false. In particular
+`U AND F = U`, where strong Kleene gives `F`.
+
+| `AND` | T | U | F |   | `OR` | T | U | F |
+|---|---|---|---|---|---|---|---|---|
+| **T** | T | U | F |   | **T** | T | T | T |
+| **U** | U | U | U |   | **U** | T | U | U |
+| **F** | F | U | F |   | **F** | T | U | F |
+
+The two shaded cells — `U AND F` and `F AND U` — are the departure. The model declines to report
+*does not occur* while any required input remains unestablished in the reviewed sources, even where
+a false sibling would settle the conjunction under strong Kleene.
+
+This is a precautionary choice, not a neutral one, and it has two costs worth stating plainly:
+
+- It suppresses some *does not occur* conclusions that would hold under **every** completion of the
+  unresolved input. The display is biased toward uncertainty rather than reassurance.
+- It can hide a safeguard's blocking provenance. When a safeguard blocks one requirement but another
+  requirement is unresolved, the downstream node reads *cannot be determined* rather than *prevented
+  by a safeguard* — so an active safeguard is not always visible as such.
+
+Both behaviours are intended and both are tested. The evaluator is `test()` inside `evaluate()` in
+`model.js`, carrying a comment to the same effect; the two lines implementing this are the most
+load-bearing in the repository.
+
 **Parameter classes** — `assumption` (an uncertain fact or projected condition) and `intervention` (a
 safeguard). Historical descriptors are a separate locked list, never controls. Every user-facing
 parameter is referenced by at least one rule; a test enforces this, so no inert control can pose as an
@@ -109,12 +138,14 @@ One hierarchy, not three overlapping ones.
 by purpose — *Understand the incident* and *Explore consequences and responses* — with the expert
 workspace offered separately below.
 
-**Four chapters** form the guided explanation: the record · the evidence boundary · pathways ·
-safeguards.
+**Five chapters** form the guided explanation: the record · the evidence boundary · pathways ·
+safeguards · governance. The chapter navigator shows all five, with the current one marked.
 
-**Two deep dives live inside their parent chapter**, not as orphan pages. *What remains unknown?* is a
-section of the evidence chapter; *Would stronger legal requirements have helped?* is a section of the
-safeguards chapter. Both are directly linkable and both carry the clicked question as the page `h1`.
+**Earlier nested URLs redirect rather than 404.** `#/evidence/unknown` resolves to `#/evidence` and
+`#/safeguards/governance` to `#/governance`, as do the `#/tour/*` and `#/explore/*` forms (see
+`LEGACY` in `ui.js`). They are rewritten with `history.replaceState`, so an old link lands on the
+right chapter and the address bar shows the canonical route. Counting them, ten routes are
+addressable; seven render distinct views — five chapters, home, and the expert workspace.
 
 **The expert workspace** is a separate destination with three named zones — Scenario, Causal graph,
 Evidence dossier — and is never presented as another tour step.
@@ -211,5 +242,6 @@ routing, heading structure, focus management, and language discipline.
 | `headless_checks.sh` | Headless-browser sweep: console errors, overflow, focus, ARIA, across routes and viewports |
 | `contrast_check.py` | WCAG contrast audit over the CSS tokens, all three theme states |
 | `validate.sh` | One offline command: rebuild check, assertions, contrast, routes |
+| `make_figures.sh` | Regenerates the appendix figures offscreen from `explorer.html`; prints the source checksum |
 | `SOURCES.md` | Source provenance, and what the sources do not settle |
 | `VALIDATION.md` | Technical and structural validation: commands, results and the ten invariants |
